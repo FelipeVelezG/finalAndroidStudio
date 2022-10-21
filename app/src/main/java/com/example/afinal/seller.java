@@ -120,7 +120,7 @@ public class seller extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 db.collection("Seller")
-                        .whereEqualTo("nameSeller", nameSeller.getText().toString())
+                        .whereEqualTo("emailSeller", emailSeller.getText().toString())
                         .get()
                         .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                             @Override
@@ -129,7 +129,7 @@ public class seller extends AppCompatActivity {
                                     if (!task.getResult().isEmpty()) {//Si encontró el documento
                                         for (QueryDocumentSnapshot document : task.getResult()) {
                                             idSeller=document.getId();
-                                            emailSeller.setText(document.getString("emailSeller"));
+                                            nameSeller.setText(document.getString("nameSeller"));
                                             phoneSeller.setText(document.getString("phoneSeller"));
                                             totalCommision.setText(document.getString("totalCommisionSeller"));
                                         }
@@ -167,8 +167,7 @@ public class seller extends AppCompatActivity {
                                 Seller.put("emailSeller", sEmailSeller);
                                 Seller.put("nameSeller", sNameSeller);
                                 Seller.put("phoneSeller", sPhoneSeller);
-                                String total = "0";
-                                Seller.put("totalCommisionSeller", total);
+                                Seller.put("totalCommisionSeller", "0");
 
 
                                 db.collection("Seller")

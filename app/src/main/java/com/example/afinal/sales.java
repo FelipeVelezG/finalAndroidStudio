@@ -1,5 +1,7 @@
 package com.example.afinal;
 
+import static java.lang.Integer.parseInt;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -23,12 +25,17 @@ import java.util.Map;
 
 public class sales extends AppCompatActivity {
     FirebaseFirestore db = FirebaseFirestore.getInstance();// intancia de firestore
-    String idSales; //Variable que contendra las ventas
-    String idSeller;
+//    String idSales; //Variable que contendra las ventas
+    String idSeller; // variable que contendra
     String venta;
     double comision;
     double contadorComision;
     String  totalcomision;
+    String email;
+    String name ;
+    String phone;
+    String comision2 ;
+
 
 
     @Override
@@ -48,41 +55,56 @@ public class sales extends AppCompatActivity {
             }
 
             private void saveSales(String sDateSales, String sSaleValue, String sEmailSellerSearch) {
-                db.collection("Seller")
-                        .whereEqualTo("emailSeller", emailSellerSearch.getText().toString())
-                        .get()
-                        .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                            @Override
-                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                                if (task.isSuccessful()) {
-                                    if (!task.getResult().isEmpty()) {//Si encontró el documento
-//                                        for (QueryDocumentSnapshot document : task.getResult()) {
-                                             Map<String, Object> Seller = new HashMap<>();// Tabla cursor
+                venta = saleValue.getText().toString();
+                comision = 0.02 * (Double.parseDouble(venta)) ;
+                contadorComision = contadorComision + comision;
+                totalcomision = String.valueOf(contadorComision);
+                if ( parseInt(venta) >= 10000000 ) {
+                    db.collection("Seller")
+                            .whereEqualTo("emailSeller", emailSellerSearch.getText().toString())
+                            .get()
+                            .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                @Override
+                                public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                    if (task.isSuccessful()) {
+                                        if (!task.getResult().isEmpty()) {//Si encontró el documento
+                                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                                idSeller=document.getId();
+                                                email = document.getString("emailSeller");
+                                                name = document.getString("nameSeller");
+                                                phone = document.getString("phoneSeller");
+                                                comision2 = document.getString("totalCommisionSeller");
 
-                                            venta = saleValue.getText().toString();
-                                            comision = 0.02 * (Double.parseDouble(venta)) ;
-                                            contadorComision = contadorComision + comision;
-                                            totalcomision = String.valueOf(contadorComision);
-                                            Seller.put("totalCommisionSeller",totalcomision );
+
+                                                Map<String, Object> Seller = new HashMap<>();// Tabla cursor
 
 
+                                                Seller.put("emailSeller", sEmailSellerSearch);
 
-                                            db.collection("Seller")
-                                                .add(Seller)
-                                                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                                                    @Override
-                                                    public void onSuccess(DocumentReference documentReference) {
+                                                Seller.put("totalCommisionSeller",totalcomision );
+
+                                                db.collection("Seller")
+                                                        .add(Seller)
+                                                        .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                                                            @Override
+                                                            public void onSuccess(DocumentReference documentReference) {
 //                                              Log.d(TAG, "DocumentSnapshot written with ID: " + documentReference.getId());
-                                                        Toast.makeText(getApplicationContext(),"Vendedor agregado correctamente...",Toast.LENGTH_LONG).show();
-                                                    }
-                                                })
-                                                .addOnFailureListener(new OnFailureListener() {
-                                                    @Override
-                                                    public void onFailure(@NonNull Exception e) {
+                                                                Toast.makeText(getApplicationContext(),"Comision agregado correctamente...",Toast.LENGTH_LONG).show();
+                                                            }
+                                                        })
+                                                        .addOnFailureListener(new OnFailureListener() {
+                                                            @Override
+                                                            public void onFailure(@NonNull Exception e) {
 //                                              Log.w(TAG, "Error adding document", e);
-                                                        Toast.makeText(getApplicationContext(),"Error! Vendedor no se guardó...",Toast.LENGTH_LONG).show();
-                                                    }
-                                                });
+                                                                Toast.makeText(getApplicationContext(),"Error! Comision no se guardó...",Toast.LENGTH_LONG).show();
+                                                            }
+                                                        });
+                                            }
+
+
+
+
+
 
 
 
@@ -95,31 +117,31 @@ public class sales extends AppCompatActivity {
                                                         public void onComplete(@NonNull Task<QuerySnapshot> task) {
 //                                                            if (task.isSuccessful()) {
 //                                                                if (task.getResult().isEmpty()) {//No encontró el documento
-                                                                    //Guardar los datos del venta(Seller)
-                                                                    Map<String, Object> Sales = new HashMap<>();// Tabla cursor
-                                                                    Sales.put("emailSales", sEmailSellerSearch);
-                                                                    Sales.put("dateSales", sDateSales);
-                                                                    Sales.put("saleValue", sSaleValue);
+                                                            //Guardar los datos del venta(Seller)
+                                                            Map<String, Object> Sales = new HashMap<>();// Tabla cursor
+                                                            Sales.put("emailSales", sEmailSellerSearch);
+                                                            Sales.put("dateSales", sDateSales);
+                                                            Sales.put("saleValue", sSaleValue);
 //
 
 
 
-                                                                    db.collection("Sales")
-                                                                            .add(Sales)
-                                                                            .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                                                                                @Override
-                                                                                public void onSuccess(DocumentReference documentReference) {
+                                                            db.collection("Sales")
+                                                                    .add(Sales)
+                                                                    .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                                                                        @Override
+                                                                        public void onSuccess(DocumentReference documentReference) {
 //                                              Log.d(TAG, "DocumentSnapshot written with ID: " + documentReference.getId());
-                                                                                    Toast.makeText(getApplicationContext(),"Venta registrada correctamente",Toast.LENGTH_LONG).show();
-                                                                                }
-                                                                            })
-                                                                            .addOnFailureListener(new OnFailureListener() {
-                                                                                @Override
-                                                                                public void onFailure(@NonNull Exception e) {
+                                                                            Toast.makeText(getApplicationContext(),"Venta registrada correctamente",Toast.LENGTH_LONG).show();
+                                                                        }
+                                                                    })
+                                                                    .addOnFailureListener(new OnFailureListener() {
+                                                                        @Override
+                                                                        public void onFailure(@NonNull Exception e) {
 //                                              Log.w(TAG, "Error adding document", e);
-                                                                                    Toast.makeText(getApplicationContext(),"Error! la venta no se registro...",Toast.LENGTH_LONG).show();
-                                                                                }
-                                                                            });
+                                                                            Toast.makeText(getApplicationContext(),"Error! la venta no se registro...",Toast.LENGTH_LONG).show();
+                                                                        }
+                                                                    });
 //                                                                }
 //                                                                else
 //                                                                {
@@ -128,7 +150,7 @@ public class sales extends AppCompatActivity {
 //                                                            }
                                                         }
                                                     });
-                                            }
+                                        }
                                     }
                                     else
                                     {
@@ -136,7 +158,14 @@ public class sales extends AppCompatActivity {
                                     }
                                 }
 //                            }
-                        });
+                            });
+
+
+                }
+                else{
+                    Toast.makeText(getApplicationContext(),"la venta debe ser superior a  $ 10'000.000",Toast.LENGTH_SHORT).show();
+                }
+
 
 
 
