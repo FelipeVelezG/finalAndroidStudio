@@ -6,6 +6,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -25,11 +26,11 @@ import java.util.Map;
 
 public class sales extends AppCompatActivity {
     FirebaseFirestore db = FirebaseFirestore.getInstance();// intancia de firestore
-//    String idSales; //Variable que contendra las ventas
+    String idSales; //Variable que contendra las ventas
     String idSeller; // variable que contendra
     String venta;
     double comision;
-    double contadorComision;
+    double contadorComision=0;
     String  totalcomision;
     String email;
     String name ;
@@ -56,10 +57,11 @@ public class sales extends AppCompatActivity {
 
             private void saveSales(String sDateSales, String sSaleValue, String sEmailSellerSearch) {
                 venta = saleValue.getText().toString();
-                comision = 0.02 * (Double.parseDouble(venta)) ;
-                contadorComision = contadorComision + comision;
-                totalcomision = String.valueOf(contadorComision);
+
                 if ( parseInt(venta) >= 10000000 ) {
+                    comision = 0.02 * (Double.parseDouble(venta)) ;
+                    contadorComision = contadorComision + comision;
+                    totalcomision = String.valueOf(contadorComision);
                     //Se busca el documento Seller para editarlo
                     db.collection("Seller")
                             .whereEqualTo("emailSeller", emailSellerSearch.getText().toString())
@@ -70,42 +72,35 @@ public class sales extends AppCompatActivity {
                                     if (task.isSuccessful()) {
                                         if (!task.getResult().isEmpty()) {//Si encontró el documento
                                             for (QueryDocumentSnapshot document : task.getResult()) {
+
                                                 // se llama el id del documento para encadenar cada registro del documento
                                                 idSeller=document.getId();
                                                 email = document.getString("emailSeller");
                                                 name = document.getString("nameSeller");
                                                 phone = document.getString("phoneSeller");
                                                 comision2 = document.getString("totalCommisionSeller");
-                                                Toast.makeText(getApplicationContext(),"email: "+ email +" name: "+name+" Phone "+phone+" Comision "+comision2,Toast.LENGTH_LONG).show();
-
-                                                Map<String, Object> Seller = new HashMap<>();// Tabla cursor
-
-
-                                                Seller.put("emailSeller", email);
-                                                Seller.put("nameSeller",name);
-                                                Seller.put("phoneSeller", phone);
-                                                Seller.put("totalCommisionSeller",totalcomision );
-
-                                                db.collection("Seller")
-                                                        .add(Seller)
-                                                        .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                                                            @Override
-                                                            public void onSuccess(DocumentReference documentReference) {
-//                                              Log.d(TAG, "DocumentSnapshot written with ID: " + documentReference.getId());
-                                                                Toast.makeText(getApplicationContext(),"Comision agregado correctamente...",Toast.LENGTH_LONG).show();
-                                                            }
-                                                        })
-                                                        .addOnFailureListener(new OnFailureListener() {
-                                                            @Override
-                                                            public void onFailure(@NonNull Exception e) {
-//                                              Log.w(TAG, "Error adding document", e);
-                                                                Toast.makeText(getApplicationContext(),"Error! Comision no se guardó...",Toast.LENGTH_LONG).show();
-                                                            }
-                                                        });
+//                                                Toast.makeText(getApplicationContext(),"email: "+ email +" name: "+name+" Phone "+phone+" Comision "+comision2,Toast.LENGTH_LONG).show();
                                             }
+                                            Map<String, Object> Seller = new HashMap<>();// Tabla cursor
+                                            Seller.put("emailSeller", email);
+                                            Seller.put("nameSeller",name);
+                                            Seller.put("phoneSeller", phone);
+                                            Seller.put("totalCommisionSeller",totalcomision );
 
-
-
+                                            db.collection("Seller").document(idSeller)
+                                                    .set(Seller)
+                                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                        @Override
+                                                        public void onSuccess(Void aVoid) {
+                                                            Toast.makeText(getApplicationContext(),""+idSeller,Toast.LENGTH_LONG).show();
+                                                        }
+                                                    })
+                                                    .addOnFailureListener(new OnFailureListener() {
+                                                        @Override
+                                                        public void onFailure(@NonNull Exception e) {
+                                                            Log.w("customer", "Error writing document", e);
+                                                        }
+                                                    });
 
 
 

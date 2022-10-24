@@ -28,6 +28,8 @@ import java.util.Map;
 public class seller extends AppCompatActivity {
     FirebaseFirestore db = FirebaseFirestore.getInstance();// intancia de firestore
     String idSeller; //Variable que contendra el id de cada  cliente (customer)
+    String condicionEliminar  ;
+    double condicionEliminarNum = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,25 +57,33 @@ public class seller extends AppCompatActivity {
                             @Override
                             public void onClick(DialogInterface arg0, int arg1) {
                                 //Se eliminara elñ cliente con el idCustomer respectivo
-                                db.collection("Seller").document(idSeller)
-                                        .delete()
-                                        .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                            @Override
-                                            public void onSuccess(Void aVoid) {
-                                                //Log.d("cliente", "DocumentSnapshot successfully deleted!");
-                                                Toast.makeText(getApplicationContext(),"Vendedor Eliminado...",Toast.LENGTH_LONG).show();
-                                                emailSeller.setText("");
-                                                nameSeller.setText("");
-                                                phoneSeller.setText("");
-                                                totalCommision.setText("");
-                                            }
-                                        })
-                                        .addOnFailureListener(new OnFailureListener() {
-                                            @Override
-                                            public void onFailure(@NonNull Exception e) {
-                                                Log.w("cliente", "Error deleting document", e);
-                                            }
-                                        });
+                                condicionEliminar = totalCommision.getText().toString();
+                                condicionEliminarNum = Double.parseDouble(condicionEliminar);
+                                if(condicionEliminarNum == 0){
+                                    db.collection("Seller").document(idSeller)
+                                            .delete()
+                                            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                @Override
+                                                public void onSuccess(Void aVoid) {
+                                                    //Log.d("cliente", "DocumentSnapshot successfully deleted!");
+                                                    emailSeller.setText("");
+                                                    nameSeller.setText("");
+                                                    phoneSeller.setText("");
+                                                    totalCommision.setText("");
+                                                    Toast.makeText(getApplicationContext(),"Vendedor Eliminado...",Toast.LENGTH_LONG).show();
+                                                }
+                                            })
+                                            .addOnFailureListener(new OnFailureListener() {
+                                                @Override
+                                                public void onFailure(@NonNull Exception e) {
+                                                    Log.w("cliente", "Error deleting document", e);
+                                                }
+                                            });
+                                }
+                                else{
+                                    Toast.makeText(getApplicationContext(),"no se puede borrar por que tiene ventas",Toast.LENGTH_SHORT).show();
+                                }
+
                             }
                         });
 
@@ -98,7 +108,7 @@ public class seller extends AppCompatActivity {
                 Seller.put("emailSeller", emailSeller.getText().toString());
                 Seller.put("nameSeller", nameSeller.getText().toString());
                 Seller.put("phoneSeller", phoneSeller.getText().toString());
-//                Seller.put("totalCommisionSeller",sTotalCommisionSeller.getText().toString());
+                Seller.put("totalCommisionSeller",totalCommision.getText().toString());
 
                 db.collection("Seller").document(idSeller)
                         .set(Seller)
