@@ -60,6 +60,7 @@ public class sales extends AppCompatActivity {
                 contadorComision = contadorComision + comision;
                 totalcomision = String.valueOf(contadorComision);
                 if ( parseInt(venta) >= 10000000 ) {
+                    //Se busca el documento Seller para editarlo
                     db.collection("Seller")
                             .whereEqualTo("emailSeller", emailSellerSearch.getText().toString())
                             .get()
@@ -69,18 +70,20 @@ public class sales extends AppCompatActivity {
                                     if (task.isSuccessful()) {
                                         if (!task.getResult().isEmpty()) {//Si encontró el documento
                                             for (QueryDocumentSnapshot document : task.getResult()) {
+                                                // se llama el id del documento para encadenar cada registro del documento
                                                 idSeller=document.getId();
                                                 email = document.getString("emailSeller");
                                                 name = document.getString("nameSeller");
                                                 phone = document.getString("phoneSeller");
                                                 comision2 = document.getString("totalCommisionSeller");
-
+                                                Toast.makeText(getApplicationContext(),"email: "+ email +" name: "+name+" Phone "+phone+" Comision "+comision2,Toast.LENGTH_LONG).show();
 
                                                 Map<String, Object> Seller = new HashMap<>();// Tabla cursor
 
 
-                                                Seller.put("emailSeller", sEmailSellerSearch);
-
+                                                Seller.put("emailSeller", email);
+                                                Seller.put("nameSeller",name);
+                                                Seller.put("phoneSeller", phone);
                                                 Seller.put("totalCommisionSeller",totalcomision );
 
                                                 db.collection("Seller")
@@ -108,7 +111,7 @@ public class sales extends AppCompatActivity {
 
 
 
-//                                            Toast.makeText(getApplicationContext(),"ingresamos la venta ",Toast.LENGTH_LONG).show();
+                                            Toast.makeText(getApplicationContext(),"ingresamos la venta ",Toast.LENGTH_LONG).show();
                                             db.collection("Sales")
                                                     .whereEqualTo("emailSales",sEmailSellerSearch )
                                                     .get()
@@ -151,11 +154,12 @@ public class sales extends AppCompatActivity {
                                                         }
                                                     });
                                         }
+                                        else
+                                        {
+                                            Toast.makeText(getApplicationContext(),"Vendedor no existe, digite correo registrado",Toast.LENGTH_SHORT).show();
+                                        }
                                     }
-                                    else
-                                    {
-                                        Toast.makeText(getApplicationContext(),"Vendedor no existe, digite correo registrado",Toast.LENGTH_SHORT).show();
-                                    }
+
                                 }
 //                            }
                             });
